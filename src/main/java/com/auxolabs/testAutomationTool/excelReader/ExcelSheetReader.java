@@ -74,9 +74,6 @@ public class ExcelSheetReader {
     }
 
     public void testReadFromExcelFile() throws IOException {
-        File currentDir = new File("");
-        String basepath = currentDir.getCanonicalPath();
-        String relativepath = "/src/main/resources/test.xlsx";
-        System.out.println(readFromExcelFile(basepath+relativepath));
+        System.out.println(readFromExcelFile("/home/nandu/Documents/TestAutomationToolUploads/"));
     }
 }

@@ -160,7 +160,7 @@ public class TestAutomationToolResource {
             File currentDir = new File("");
             String basepath = currentDir.getCanonicalPath();
             String relativepath = "/src/main/resources/" + fileDetails.getFileName();
-            String location = basepath + relativepath;
+            String location = "/home/nandu/Documents/TestAutomationToolUploads"+ fileDetails.getFileName();
             saveFile(inputStream, location);
             String output = "The file is uploaded to " + location;
             ExcelSheetReader excelSheetReader = new ExcelSheetReader();

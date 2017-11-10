@@ -73,7 +73,4 @@ public class ExcelSheetReader {
         return documentData;
     }
 
-    public void testReadFromExcelFile() throws IOException {
-        System.out.println(readFromExcelFile("/home/nandu/Documents/TestAutomationToolUploads/"));
-    }
 }

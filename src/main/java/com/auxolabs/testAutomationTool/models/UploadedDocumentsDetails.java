@@ -3,20 +3,26 @@ package com.auxolabs.testAutomationTool.models;
 import java.util.ArrayList;
 
 public class UploadedDocumentsDetails {
-    private long testId;
+    private String _id;
+    private String testId;
     private ArrayList<String> documentNames;
 
     public UploadedDocumentsDetails() {
-        testId = 0;
         documentNames = new ArrayList<String>();
     }
 
-    public UploadedDocumentsDetails(long testId, ArrayList<String> documentNames) {
+    public UploadedDocumentsDetails(String _id, String testId, ArrayList<String> documentNames) {
+        this._id = _id;
+
         this.testId = testId;
         this.documentNames = documentNames;
     }
 
-    public long getTestId() {
+    public String get_id() {
+        return _id;
+    }
+
+    public String getTestId() {
         return testId;
     }
 

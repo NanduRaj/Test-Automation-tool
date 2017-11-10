@@ -4,6 +4,7 @@ import com.auxolabs.testAutomationTool.configuration.TestAutomationToolConfigura
 import com.auxolabs.testAutomationTool.models.AllTestDetails;
 import com.auxolabs.testAutomationTool.models.TestDetails;
 import com.auxolabs.testAutomationTool.models.TestResult;
+import com.auxolabs.testAutomationTool.models.UploadedDocumentsDetails;
 import com.auxolabs.testAutomationTool.models.request.PutPostTestDetailsRequestModel;
 import org.bson.types.ObjectId;
 
@@ -49,4 +50,7 @@ public class TestAutomationToolDao {
         return helper.getAllTestDetails();
     }
 
+    public UploadedDocumentsDetails addUploadedDocumentsDetail(String id, String locationOfFile){
+        return helper.addUploadedDocuments(id,locationOfFile);
+    }
 }

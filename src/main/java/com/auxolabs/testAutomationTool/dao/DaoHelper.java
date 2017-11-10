@@ -3,6 +3,7 @@ package com.auxolabs.testAutomationTool.dao;
 import com.auxolabs.testAutomationTool.MongoConnector;
 import com.auxolabs.testAutomationTool.configuration.TestAutomationToolConfiguration;
 import com.auxolabs.testAutomationTool.models.AllTestDetails;
+import com.auxolabs.testAutomationTool.models.UploadedDocumentsDetails;
 import com.auxolabs.testAutomationTool.models.request.PutPostTestDetailsRequestModel;
 import com.auxolabs.testAutomationTool.models.TestDetails;
 import com.auxolabs.testAutomationTool.models.TestResult;
@@ -19,11 +20,13 @@ class DaoHelper {
     private MongoConnector mongoConnector;
     private String collectionName1;
     private String collectionName2;
+    private String collectionName3;
     private static final Logger logger = Logger.getLogger(DaoHelper.class.getName());
     DaoHelper(TestAutomationToolConfiguration configuration){
         this.mongoConnector = new MongoConnector(configuration);
         collectionName1 = "testDetails";
         collectionName2 = "testResults";
+        collectionName3 = "uploadedDocuments";
         logger.addHandler(new ConsoleHandler());
         logger.setLevel(Level.FINE);
     }
@@ -37,7 +40,7 @@ class DaoHelper {
                                             .append("contentType", putPostTestDetailsRequestModel.getContentType()).append("date", System.currentTimeMillis());
         try {
             mongoConnector.insert(collectionName1, toInsert);
-            return new TestDetails(toInsert.getObjectId("_id"), putPostTestDetailsRequestModel.getTestName(), putPostTestDetailsRequestModel.getHttpMethod(), putPostTestDetailsRequestModel.getUrl(), putPostTestDetailsRequestModel.getRequestParameters(), putPostTestDetailsRequestModel.getResponseParameters(), putPostTestDetailsRequestModel.getContentType(),toInsert.getLong("date"));
+            return new TestDetails(toInsert.getObjectId("_id").toString(), putPostTestDetailsRequestModel.getTestName(), putPostTestDetailsRequestModel.getHttpMethod(), putPostTestDetailsRequestModel.getUrl(), putPostTestDetailsRequestModel.getRequestParameters(), putPostTestDetailsRequestModel.getResponseParameters(), putPostTestDetailsRequestModel.getContentType(),toInsert.getLong("date"));
         }catch (Exception e){
             logger.severe("Error at adding document");
         }
@@ -50,7 +53,7 @@ class DaoHelper {
         if (details == null)
             return null;
         logger.info("Test name is : "+ details.getString("testName"));
-        return new TestDetails(details.getObjectId("_id"),details.getString("testName"),details.getString("httpMethod"),
+        return new TestDetails(details.getObjectId("_id").toString(),details.getString("testName"),details.getString("httpMethod"),
                                                     details.getString("url"), (Map<String,String>) (details.get("requestParameters")),
                                                     (Map<String,String>) (details.get("responseParameters")),
                                                     details.getString("contentType"),details.getLong("date"));
@@ -82,7 +85,7 @@ class DaoHelper {
                 .append("contentType",putPostTestDetailsRequestModel.getContentType()).append("date",toUpdateTestDetails.getDate()));
         try {
             mongoConnector.update(collectionName1,query,updated);
-            return new TestDetails(id,putPostTestDetailsRequestModel.getTestName(), putPostTestDetailsRequestModel.getHttpMethod(), putPostTestDetailsRequestModel.getUrl(), putPostTestDetailsRequestModel.getRequestParameters(), putPostTestDetailsRequestModel.getResponseParameters(), putPostTestDetailsRequestModel.getContentType(),toUpdateTestDetails.getDate());
+            return new TestDetails(id.toString(),putPostTestDetailsRequestModel.getTestName(), putPostTestDetailsRequestModel.getHttpMethod(), putPostTestDetailsRequestModel.getUrl(), putPostTestDetailsRequestModel.getRequestParameters(), putPostTestDetailsRequestModel.getResponseParameters(), putPostTestDetailsRequestModel.getContentType(),toUpdateTestDetails.getDate());
         }catch (Exception e){
             logger.severe("Couldnt update");
             return null;
@@ -137,4 +140,17 @@ class DaoHelper {
         return -1;
     }
 
+    UploadedDocumentsDetails addUploadedDocuments(String id, String locationOfFile){
+        ArrayList<String> documents = new ArrayList<String>();
+        documents.add(locationOfFile);
+        List<Document> allDocumentDetails = mongoConnector.getAllDocuments(collectionName3);
+        Document toInsert = new Document("testId",id).append("documentNames",documents);
+        try {
+            mongoConnector.insert(collectionName3, toInsert);
+            return new UploadedDocumentsDetails(toInsert.getObjectId("_id").toString(), toInsert.getString("testId"),(ArrayList<String>) toInsert.get("documentNames"));
+        }catch (Exception e){
+            logger.severe("Error at adding document");
+        }
+        return null;
+    }
 }

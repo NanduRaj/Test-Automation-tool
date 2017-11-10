@@ -1,7 +1,5 @@
 package com.auxolabs.testAutomationTool.models;
 
-import org.bson.types.ObjectId;
-
 public class AllTestDetails {
     @net.vz.mongodb.jackson.ObjectId
     private String id;

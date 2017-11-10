@@ -5,11 +5,9 @@ import com.auxolabs.testAutomationTool.dao.TestAutomationToolDao;
 import com.auxolabs.testAutomationTool.excelReader.ExcelSheetReader;
 import com.auxolabs.testAutomationTool.models.AllTestDetails;
 import com.auxolabs.testAutomationTool.models.TestDetails;
-import com.auxolabs.testAutomationTool.models.response.BaseResponse;
-import com.auxolabs.testAutomationTool.models.response.HomeScreenResponse;
-import com.auxolabs.testAutomationTool.models.response.TestDetailsResponse;
+import com.auxolabs.testAutomationTool.models.UploadedDocumentsDetails;
+import com.auxolabs.testAutomationTool.models.response.*;
 import com.auxolabs.testAutomationTool.models.TestResult;
-import com.auxolabs.testAutomationTool.models.response.TestResultsResponse;
 import com.auxolabs.testAutomationTool.models.request.PutPostTestDetailsRequestModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -23,7 +21,7 @@ import javax.ws.rs.core.Response;
 import java.io.*;
 import java.util.List;
 
-@Path("/test")
+@Path("/testAutomationTool")
 @Api(value = "TestAutomationTool")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -35,56 +33,56 @@ public class TestAutomationToolResource {
     }
 
     @PUT
-    @ApiOperation(value = "create new test",response = TestDetailsResponse.class)
+    @ApiOperation(value = "create new test",response = TestDetailsResponseModel.class)
     public Response createTest(PutPostTestDetailsRequestModel putPostTestDetailsRequestModel){
         try {
             TestDetails testDetails = dao.addTestDetails(putPostTestDetailsRequestModel);
             if (testDetails != null) {
-                TestDetailsResponse testDetailsResponse = new TestDetailsResponse("Success","The record is created",testDetails);
-                return Response.ok(testDetailsResponse).build();
+                TestDetailsResponseModel testDetailsResponseModel = new TestDetailsResponseModel("Success","The record is created",testDetails);
+                return Response.ok(testDetailsResponseModel).build();
             }
             else {
-                TestDetailsResponse testDetailsResponse = new TestDetailsResponse("Failure","The record was not created",null);
-                return Response.ok(testDetailsResponse).build();
+                TestDetailsResponseModel testDetailsResponseModel = new TestDetailsResponseModel("Failure","The record was not created",null);
+                return Response.ok(testDetailsResponseModel).build();
             }
         }catch (Exception e){
-            return Response.serverError().entity(new TestDetailsResponse("Failure", "Api error", null)).build();
+            return Response.serverError().entity(new TestDetailsResponseModel("Failure", "Api error", null)).build();
         }
     }
 
-    @ApiOperation(value = "get test details",response = TestDetailsResponse.class)
+    @ApiOperation(value = "get test details",response = TestDetailsResponseModel.class)
     @GET
-    @Path("/{id}")
-    public Response getTestDetails(@PathParam("id") ObjectId testId){
+    @Path("/details")
+    public Response getTestDetails(@QueryParam("id") ObjectId testId){
         try {
             TestDetails testDetails = dao.getTestDetails(testId);
             if (testDetails != null) {
-                TestDetailsResponse testDetailsResponse= new TestDetailsResponse("Success", "The student has been fetched with id "+ testId, testDetails);
-                return Response.ok(testDetailsResponse).build();
+                TestDetailsResponseModel testDetailsResponseModel = new TestDetailsResponseModel("Success", "The student has been fetched with id "+ testId, testDetails);
+                return Response.ok(testDetailsResponseModel).build();
             } else {
-                TestDetailsResponse testDetailsResponse = new TestDetailsResponse("Success", "No such record found", null);
-                return Response.ok(testDetailsResponse).build();
+                TestDetailsResponseModel testDetailsResponseModel = new TestDetailsResponseModel("Success", "No such record found", null);
+                return Response.ok(testDetailsResponseModel).build();
             }
         }catch (Exception e) {
-            return Response.serverError().entity(new TestDetailsResponse("Failure", "Api error", null)).build();
+            return Response.serverError().entity(new TestDetailsResponseModel("Failure", "Api error", null)).build();
         }
     }
 
-    @ApiOperation(value = "update a test",response = TestDetailsResponse.class)
+    @ApiOperation(value = "update a test",response = TestDetailsResponseModel.class)
     @POST
     @Path("/{id}")
     public Response updateTestDetails(@PathParam("id") ObjectId testId, PutPostTestDetailsRequestModel putPostTestDetailsRequestModel) {
         try {
             TestDetails testDetails = dao.updateTestDetails(testId, putPostTestDetailsRequestModel);
             if (testDetails != null) {
-                TestDetailsResponse testDetailsResponse = new TestDetailsResponse("Success", "The record is updated", testDetails);
-                return Response.ok(testDetailsResponse).build();
+                TestDetailsResponseModel testDetailsResponseModel = new TestDetailsResponseModel("Success", "The record is updated", testDetails);
+                return Response.ok(testDetailsResponseModel).build();
             } else {
-                TestDetailsResponse testDetailsResponse = new TestDetailsResponse("Failure", "No such record found", null);
-                return Response.ok(testDetailsResponse).build();
+                TestDetailsResponseModel testDetailsResponseModel = new TestDetailsResponseModel("Failure", "No such record found", null);
+                return Response.ok(testDetailsResponseModel).build();
             }
         } catch (Exception e) {
-            return Response.serverError().entity(new TestDetailsResponse("Failure", "Api error", null)).build();
+            return Response.serverError().entity(new TestDetailsResponseModel("Failure", "Api error", null)).build();
         }
     }
 
@@ -95,36 +93,36 @@ public class TestAutomationToolResource {
         try {
             long isDeleted = dao.deleteTestDetails(testId);
             if (isDeleted > 0) {
-                TestDetailsResponse testDetailsResponse = new TestDetailsResponse("Success", "The record is deleted", null);
-                return Response.ok(testDetailsResponse).build();
+                TestDetailsResponseModel testDetailsResponseModel = new TestDetailsResponseModel("Success", "The record is deleted", null);
+                return Response.ok(testDetailsResponseModel).build();
             }
             else {
-                TestDetailsResponse testDetailsResponse = new TestDetailsResponse("Failure", "The record not found", null);
-                return Response.ok(testDetailsResponse).entity("Document not found").build();
+                TestDetailsResponseModel testDetailsResponseModel = new TestDetailsResponseModel("Failure", "The record not found", null);
+                return Response.ok(testDetailsResponseModel).entity("Document not found").build();
             }
         }catch (Exception e){
-            return Response.serverError().entity(new TestDetailsResponse("Failure", "Api error", null)).build();
+            return Response.serverError().entity(new TestDetailsResponseModel("Failure", "Api error", null)).build();
         }
     }
 
     @ApiOperation(value = "get test results")
     @GET
-    @Path("/{id}/results")
-    public Response getTestResults(@PathParam("id") String testId){
+    @Path("/results")
+    public Response getTestResults(@QueryParam("id") String testId){
         try {
             List<TestResult> testResult = dao.getTestResults(testId);
             if(testResult != null){
-                TestResultsResponse testResultsResponse = new TestResultsResponse("Success","The record is fetched",testResult);
-                return Response.ok(testResultsResponse).build();
+                TestResultsResponseModel testResultsResponseModel = new TestResultsResponseModel("Success","The record is fetched",testResult);
+                return Response.ok(testResultsResponseModel).build();
             }
             else{
-                TestResultsResponse testResultsResponse = new TestResultsResponse("Failed","The record is not found",null);
-                return Response.ok(testResultsResponse).build();
+                TestResultsResponseModel testResultsResponseModel = new TestResultsResponseModel("Failed","The record is not found",null);
+                return Response.ok(testResultsResponseModel).build();
             }
 
         }catch (Exception e){
             e.printStackTrace();
-            return Response.serverError().entity(new TestDetailsResponse("Failure", "Api error", null)).build();
+            return Response.serverError().entity(new TestDetailsResponseModel("Failure", "Api error", null)).build();
         }
     }
 
@@ -134,25 +132,26 @@ public class TestAutomationToolResource {
         try {
             List<AllTestDetails> allTestDetails = dao.getAllTestDetails();
             if (allTestDetails != null){
-                HomeScreenResponse homeScreenResponse = new HomeScreenResponse("Success","The test details are fetched",allTestDetails);
-                return Response.ok(homeScreenResponse).build();
+                AllTestDetailsResponseModel allTestDetailsResponseModel = new AllTestDetailsResponseModel("Success","The test details are fetched",allTestDetails);
+                return Response.ok(allTestDetailsResponseModel).build();
             }
             else {
-                HomeScreenResponse homeScreenResponse = new HomeScreenResponse("Failure","The test details couldnt be fetched",null);
-                return Response.ok(homeScreenResponse).build();
+                AllTestDetailsResponseModel allTestDetailsResponseModel = new AllTestDetailsResponseModel("Failure","The test details couldnt be fetched",null);
+                return Response.ok(allTestDetailsResponseModel).build();
             }
 
         }catch (Exception e){
             e.printStackTrace();
-            return Response.serverError().entity(new HomeScreenResponse("Failure","Api error",null)).build();
+            return Response.serverError().entity(new AllTestDetailsResponseModel("Failure","Api error",null)).build();
         }
     }
 
     @ApiOperation(value = "upload the file")
     @PUT
-    @Path("/upload")
+    @Path("/{id}/upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response uploadFile(
+            @PathParam("id") String id,
             @FormDataParam("file") InputStream inputStream,
             @FormDataParam("file") FormDataContentDisposition fileDetails
             ) throws IOException {
@@ -160,12 +159,16 @@ public class TestAutomationToolResource {
             String location = "/home/nandu/Documents/TestAutomationToolUploads/"+ fileDetails.getFileName();
             saveFile(inputStream, location);
             String output = "The file is uploaded to " + location;
+            UploadedDocumentsDetails uploadedDocumentsDetails = dao.addUploadedDocumentsDetail(id,location);
             ExcelSheetReader excelSheetReader = new ExcelSheetReader();
             System.out.println(excelSheetReader.readFromExcelFile(location));
-            return Response.ok(new BaseResponse("Success", output)).build();
+            if (uploadedDocumentsDetails != null)
+                return Response.ok(new UploadedDocumentsModel("Success", "Successfully inserted : "+ output, uploadedDocumentsDetails)).build();
+            else
+                return Response.ok(new BaseResponse("Failed","couldnt upload")).build();
         }catch (Exception e){
             e.printStackTrace();
-            return Response.serverError().entity(new BaseResponse("Failure","Couldnt upload")).build();
+            return Response.serverError().entity(new BaseResponse("Failure","Api error")).build();
         }
     }
 
@@ -179,4 +182,5 @@ public class TestAutomationToolResource {
         outputStream.flush();
         outputStream.close();
     }
+
 }

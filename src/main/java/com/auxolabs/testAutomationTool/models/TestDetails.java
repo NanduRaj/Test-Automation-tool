@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class TestDetails implements Serializable{
     @JsonProperty
-    private ObjectId _id;
+    private String _id;
     @JsonProperty
     private String testName;
     @JsonProperty
@@ -29,7 +29,7 @@ public class TestDetails implements Serializable{
         responseParameters = new HashMap<String, String>();
     }
 
-    public TestDetails(ObjectId testId, String testName, String httpMethod, String url, Map<String,String> requestParameters,
+    public TestDetails(String testId, String testName, String httpMethod, String url, Map<String,String> requestParameters,
                        Map<String,String> responseParameters, String contentType, long date){
         this._id = testId;
         this.testName = testName;
@@ -41,7 +41,7 @@ public class TestDetails implements Serializable{
         this.date = date;
     }
 
-    public ObjectId get_id() {
+    public String get_id() {
         return _id;
     }
 

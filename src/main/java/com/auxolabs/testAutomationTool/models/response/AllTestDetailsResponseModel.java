@@ -9,9 +9,9 @@ public class AllTestDetailsResponseModel extends BaseResponse {
     @JsonProperty
     private List<AllTestDetails> allTestDetails;
     public AllTestDetailsResponseModel(){}
-    public AllTestDetailsResponseModel(String status, String message, List<AllTestDetails> homeScreen){
+    public AllTestDetailsResponseModel(String status, String message, List<AllTestDetails> allTestDetails){
         super(status, message);
-        this.allTestDetails = homeScreen;
+        this.allTestDetails = allTestDetails;
     }
 
 }

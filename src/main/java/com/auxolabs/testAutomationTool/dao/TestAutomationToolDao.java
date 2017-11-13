@@ -5,9 +5,14 @@ import com.auxolabs.testAutomationTool.models.AllTestDetails;
 import com.auxolabs.testAutomationTool.models.TestDetails;
 import com.auxolabs.testAutomationTool.models.TestResult;
 import com.auxolabs.testAutomationTool.models.UploadedDocumentsDetails;
+import com.auxolabs.testAutomationTool.models.request.AddTestResultRequestModel;
 import com.auxolabs.testAutomationTool.models.request.PutPostTestDetailsRequestModel;
+import com.auxolabs.testAutomationTool.models.response.CurrentTestResultResponseModel;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import org.bson.types.ObjectId;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
@@ -52,5 +57,17 @@ public class TestAutomationToolDao {
 
     public UploadedDocumentsDetails addUploadedDocumentsDetail(String id, String locationOfFile){
         return helper.addUploadedDocuments(id,locationOfFile);
+    }
+
+    public UploadedDocumentsDetails getUploadedDocumentDetails(String id){
+        return helper.getUploadedDocumentDetails(id);
+    }
+
+    public CurrentTestResultResponseModel test(TestDetails testDetails, UploadedDocumentsDetails uploadedDocumentsDetails) throws ParseException, UnirestException, IOException {
+        return helper.test(testDetails, uploadedDocumentsDetails);
+    }
+
+    public void addTestResults(AddTestResultRequestModel addTestResultRequestModel){
+        helper.addTestResults(addTestResultRequestModel);
     }
 }

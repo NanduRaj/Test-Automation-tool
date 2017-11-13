@@ -6,9 +6,11 @@ import com.auxolabs.testAutomationTool.excelReader.ExcelSheetReader;
 import com.auxolabs.testAutomationTool.models.AllTestDetails;
 import com.auxolabs.testAutomationTool.models.TestDetails;
 import com.auxolabs.testAutomationTool.models.UploadedDocumentsDetails;
+import com.auxolabs.testAutomationTool.models.request.AddTestResultRequestModel;
 import com.auxolabs.testAutomationTool.models.response.*;
 import com.auxolabs.testAutomationTool.models.TestResult;
 import com.auxolabs.testAutomationTool.models.request.PutPostTestDetailsRequestModel;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.bson.types.ObjectId;
@@ -19,6 +21,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.*;
+import java.text.ParseException;
 import java.util.List;
 
 @Path("/testAutomationTool")
@@ -112,12 +115,12 @@ public class TestAutomationToolResource {
         try {
             List<TestResult> testResult = dao.getTestResults(testId);
             if(testResult != null){
-                TestResultsResponseModel testResultsResponseModel = new TestResultsResponseModel("Success","The record is fetched",testResult);
-                return Response.ok(testResultsResponseModel).build();
+                AllTestResultsResponseModel allTestResultsResponseModel = new AllTestResultsResponseModel("Success","The record is fetched",testResult);
+                return Response.ok(allTestResultsResponseModel).build();
             }
             else{
-                TestResultsResponseModel testResultsResponseModel = new TestResultsResponseModel("Failed","The record is not found",null);
-                return Response.ok(testResultsResponseModel).build();
+                AllTestResultsResponseModel allTestResultsResponseModel = new AllTestResultsResponseModel("Failed","The record is not found",null);
+                return Response.ok(allTestResultsResponseModel).build();
             }
 
         }catch (Exception e){
@@ -183,4 +186,19 @@ public class TestAutomationToolResource {
         outputStream.close();
     }
 
+    @ApiOperation("to test the particular test with given id")
+    @GET
+    @Path("/test/{testId}")
+    public Response test(@PathParam("testId") ObjectId testId ) throws ParseException, UnirestException {
+        try {
+            TestDetails testDetails = dao.getTestDetails(testId);
+            UploadedDocumentsDetails documentsDetails = dao.getUploadedDocumentDetails(testId.toString());
+            CurrentTestResultResponseModel testResult = dao.test(testDetails,documentsDetails);
+            dao.addTestResults(new AddTestResultRequestModel(testResult.getTestId(),testResult.getSuccess(),testResult.getFailure(),testResult.getDate()));
+            return Response.ok(testResult).build();
+        }catch (Exception e){
+            e.printStackTrace();
+            return Response.serverError().entity(new BaseResponse("Failure","Api error")).build();
+        }
+    }
 }

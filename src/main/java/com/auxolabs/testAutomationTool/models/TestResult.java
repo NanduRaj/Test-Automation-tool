@@ -21,12 +21,12 @@ public class TestResult implements Serializable {
 
     public TestResult(){}
 
-    public TestResult(String _id, String testId, Double success, Double failure, Double date) {
+    public TestResult(String _id, String testId, Long success, Long failure, Long date) {
         this._id = _id;
         this.testId = testId;
-        this.success = success.longValue();
-        this.failure = failure.longValue();
-        this.date = date.longValue();
+        this.success = success;
+        this.failure = failure;
+        this.date = date;
     }
 
     public String get_id() {

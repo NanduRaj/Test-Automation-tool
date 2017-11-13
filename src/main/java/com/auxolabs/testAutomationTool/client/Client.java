@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 public class Client {
     private static HashMap<String,Object> responseData;
@@ -59,11 +60,13 @@ public class Client {
         return responseData;
     }
 
-    public HashMap<String,Object> getResponse() throws UnirestException, ParseException {
+    public HashMap<String,Object> getResponse(String url, Map<String,Object> requestParams) throws UnirestException, ParseException {
 
-        HttpResponse<JsonNode> tagResponse = Unirest.get("http://96.84.49.11:8080/inference/tags/{tagId}").
+        String key = requestParams.keySet().toArray()[0].toString();
+        String value = requestParams.get(key).toString();
+        HttpResponse<JsonNode> tagResponse = Unirest.get(url).
                 header("accept", "application/json").
-                routeParam("tagId", "212678144").
+                routeParam(key,value).
                 asJson();
         JSONObject jsonObject = tagResponse.getBody().getObject();
         return parseJson(jsonObject);

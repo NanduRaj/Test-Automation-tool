@@ -39,6 +39,11 @@ class DaoHelper {
         logger.setLevel(Level.FINE);
     }
 
+    /**
+     * function to add a new test
+     * @param putPostTestDetailsRequestModel, the model class used for the request
+     * @return TestDetails, the class model having the details of test
+     */
     TestDetails addTest(PutPostTestDetailsRequestModel putPostTestDetailsRequestModel) {
 
         logger.log(Level.FINE, "Method addTest of DaoHelper is called");
@@ -52,6 +57,11 @@ class DaoHelper {
         return null;
     }
 
+    /**
+     * function to get details of a given test
+     * @param id, the testId
+     * @return TestDetails, the class model having the details of test
+     */
     TestDetails getDetails(ObjectId id) {
         Document query = new Document("_id", id);
         Document details = mongoConnector.getDocument(collectionName1, query);
@@ -60,6 +70,11 @@ class DaoHelper {
         return new TestDetails(details.getObjectId("_id").toString(), details.getString("testName"), details.getString("httpMethod"), details.getString("url"), (Map<String, String>) (details.get("requestParameters")), (Map<String, String>) (details.get("responseParameters")), details.getString("contentType"), details.getLong("date"));
     }
 
+    /**
+     * function to fetch the results of a test
+     * @param id the testId
+     * @return list of testResult class model
+     */
     List<TestResult> getResults(String id) {
         List<Document> allDocuments = mongoConnector.getAllDocuments(collectionName2);
         List<TestResult> results = new ArrayList<TestResult>();
@@ -73,6 +88,12 @@ class DaoHelper {
         return results;
     }
 
+    /**
+     * function to update a test
+     * @param id, id of the test
+     * @param putPostTestDetailsRequestModel, the model class used for the request
+     * @return TestDetails, the class model having the details of test
+     */
     TestDetails updateTestDetails(ObjectId id, PutPostTestDetailsRequestModel putPostTestDetailsRequestModel) {
         TestDetails toUpdateTestDetails = getDetails(id);
         if (toUpdateTestDetails == null) return null;
@@ -89,6 +110,11 @@ class DaoHelper {
         }
     }
 
+    /**
+     * function to delete test Details
+     * @param id, id of test to be deleted
+     * @return number of documents deleted
+     */
     long deleteDetails(ObjectId id) {
         TestDetails toDeleteTestDetails = getDetails(id);
         if (toDeleteTestDetails == null) return 0;
@@ -96,6 +122,10 @@ class DaoHelper {
         return mongoConnector.delete(collectionName1, query);
     }
 
+    /**
+     * function to get all test Details
+     * @return list of model class AllTestDetails
+     */
     List<AllTestDetails> getAllTestDetails() {
         List<Document> allDocumentDetails = mongoConnector.getAllDocuments(collectionName1);
         List<Document> allDocumentResults = mongoConnector.getAllDocuments(collectionName2);
@@ -103,14 +133,20 @@ class DaoHelper {
         for (Document documentOfDetails : allDocumentDetails) {
             String id = documentOfDetails.getObjectId("_id").toString();
             String testName = documentOfDetails.getString("testName");
-            long date = findlatestDate(id, allDocumentResults);
+            long date = findLatestDate(id, allDocumentResults);
             float successPercentage = findlatestSuccessPercentage(id, date, allDocumentResults);
             allTestDetails.add(new AllTestDetails(id, testName, date, successPercentage));
         }
         return allTestDetails;
     }
 
-    private long findlatestDate(String id, List<Document> allDocumentResults) {
+    /**
+     * helper function to get the last date the test being done
+     * @param id, the testId
+     * @param allDocumentResults, list of all documents in the testResult collection
+     * @return date on which the test was last conducted
+     */
+    private long findLatestDate(String id, List<Document> allDocumentResults) {
         long largest = 0;
         for (Document documentOfResults : allDocumentResults) {
             if (documentOfResults.getString("testId").equals(id)) {
@@ -123,6 +159,13 @@ class DaoHelper {
         return largest;
     }
 
+    /**
+     * helper function to get the latest success percentage
+     * @param id, the testId
+     * @param date, the date returned from function findLatestDate
+     * @param allDocumentResults, success percentage
+     * @return
+     */
     private float findlatestSuccessPercentage(String id, long date, List<Document> allDocumentResults) {
         for (Document documentOfResults : allDocumentResults) {
             String currentId = documentOfResults.getString("testId");
@@ -135,6 +178,13 @@ class DaoHelper {
         }
         return 0;
     }
+
+    /**
+     * function to add documents uploaded
+     * @param id testId
+     * @param locationOfFile path where document is stored
+     * @return UploadDocumentDetails , a class model
+     */
 
     UploadedDocumentsDetails addUploadedDocuments(String id, String locationOfFile) {
         ArrayList<String> documents = new ArrayList<String>();
@@ -150,6 +200,11 @@ class DaoHelper {
         return null;
     }
 
+    /**
+     * function to get Uploaded document details from collection uploadedDocuments
+     * @param id testId
+     * @return UploadedDocumentsDetails class model
+     */
     UploadedDocumentsDetails getUploadedDocumentDetails(String id) {
         Document query = new Document("testId", id);
         Document details = mongoConnector.getDocument(collectionName3, query);
@@ -157,6 +212,15 @@ class DaoHelper {
         return (new UploadedDocumentsDetails(details.getObjectId("_id").toString(), details.getString("testId"), (ArrayList<String>) details.get("documentNames")));
     }
 
+    /**
+     * function to test
+     * @param testDetails the details of the test from the collection testDetails
+     * @param documentsDetails, the details of the uploaded documents from collection uploaded document
+     * @return CurrentTestResultResponseModel, a model class
+     * @throws ParseException
+     * @throws UnirestException
+     * @throws IOException
+     */
     CurrentTestResultResponseModel test(TestDetails testDetails, UploadedDocumentsDetails documentsDetails) throws ParseException, UnirestException, IOException {
 
         long success = 0, failure = 0;
@@ -195,6 +259,10 @@ class DaoHelper {
         return (new CurrentTestResultResponseModel("Success","Tested succesfully",testDetails.get_id(),success,failure,successPercentage,new Date().getTime()));
     }
 
+    /**
+     * function to add test Results to the collection testResult
+     * @param addTestResultRequestModel, model class
+     */
     void addTestResults(AddTestResultRequestModel addTestResultRequestModel){
         Document toInsert = new Document("testId",addTestResultRequestModel.getTestId()).append("success",addTestResultRequestModel.getSuccess())
                                     .append("failure",addTestResultRequestModel.getFailure()).append("date",addTestResultRequestModel.getDate());

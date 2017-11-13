@@ -80,7 +80,7 @@ class DaoHelper {
         List<TestResult> results = new ArrayList<TestResult>();
         for (Document document : allDocuments) {
             if (id.equals(document.getString("testId"))) {
-                TestResult testResult = new TestResult(document.getObjectId("_id").toString(), document.getString("testId"), document.getDouble("success"), document.getDouble("failure"), document.getDouble("date"));
+                TestResult testResult = new TestResult(document.getObjectId("_id").toString(), document.getString("testId"), document.getLong("success"), document.getLong("failure"), document.getLong("date"));
                 results.add(testResult);
             }
         }
@@ -228,10 +228,10 @@ class DaoHelper {
         ArrayList<String> documentNames = documentsDetails.getDocumentNames();
 
         ExcelSheetReader excelSheetReader = new ExcelSheetReader();
-        HashMap<String, ArrayList<Object>> excelData = excelSheetReader.readFromExcelFile(documentNames.get(0));
+        HashMap<String, ArrayList<Object>> excelData = excelSheetReader.readFromExcelFile(documentNames.get(0)); // need to be modified, now doesnt look the condition for more than one documents uploaded
 
         Map<String, Object> requestparamValue = new HashMap<String, Object>();
-        Object requestParameterAsInUploadedDocument = testDetails.getRequestParameters().values().toArray()[0];
+        Object requestParameterAsInUploadedDocument = testDetails.getRequestParameters().values().toArray()[0]; // checked only assuming there is only one request parameter(mostly id)
         ArrayList<Object> excelMappingValues = excelData.get(requestParameterAsInUploadedDocument);
         for (Object id : excelMappingValues) {
             int flag = 1;
@@ -240,11 +240,13 @@ class DaoHelper {
             for (String key : testDetails.getRequestParameters().keySet()) {
                 requestparamValue.put(key, idToTest);
             }
+
             HashMap<String, Object> testUrlResponse = client.getResponse(testDetails.getUrl(), requestparamValue);
             for (String responseParameter : testDetails.getResponseParameters().keySet()) {
                 Object value = testUrlResponse.get(responseParameter);
                 int index = (excelData.get(requestParameterAsInUploadedDocument).indexOf(idToTest));
-                if (!(testUrlResponse.get(responseParameter) == excelData.get(testDetails.getResponseParameters().get(responseParameter)).get(index) || testUrlResponse.get(responseParameter).toString().equals(excelData.get(testDetails.getResponseParameters().get(responseParameter)).get(index).toString()))) {
+                if (!(testUrlResponse.get(responseParameter) == excelData.get(testDetails.getResponseParameters().get(responseParameter)).get(index) ||    // to compare variable types other than string
+                        testUrlResponse.get(responseParameter).toString().equals(excelData.get(testDetails.getResponseParameters().get(responseParameter)).get(index).toString()))) { //to compare string types
                     flag = 0;
                     break;
                 }
